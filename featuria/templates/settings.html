@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+
+    <form  class="form-inline" method="POST" action="{{ url_for('update_priority_range') }}">
+    <legend class="border-bottom mb-2">{{ legend }}</legend>
+        {{ priority_range_form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ priority_range_form.range.label(class="form-control-label mr-sm-2") }}
+                {% if priority_range_form.range.errors %}
+                    {{ priority_range_form.range(class="form-control form-control-lg is-invalid  mr-sm-2") }}
+
+
+
+                {% else %}
+                    {{ priority_range_form.range(class="form-control form-control-lg") }}
+                {% endif %}
+
+
+            </div>
+        <div class="form-group">
+            {{ priority_range_form.submit(class="btn btn-outline-info ml-sm-2") }}
+        </div>
+
+
+
+
+    </form>
+    {% if priority_range_form.range.errors %}
+    <div class="row">
+
+        {% for error in priority_range_form.range.errors %}
+                            <span class="ml-4" style="color: red;">{{ error }}</span>
+        {% endfor %}
+
+    </div>
+
+
+    {% endif %}
+     <div class="border-bottom mb-4 mt-2">
+         <h5>Product Areas</h5>
+         <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+
+                    <th scope="col">Name</th>
+                    <th scope="col">Date Added</th>
+                    <th scope="col">Added By</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% if product_areas %}
+                    {% for product_area in product_areas %}
+                        <tr>
+                            <td>{{ product_area.title }}</td>
+                            <td>{{ product_area.date_added.strftime('%B %d, %Y') }}</td>
+                            <td>{{ product_area.creator }}</td>
+
+                            <td>
+                                {% if product_area.creator.id == current_user.id %}
+                                    <a href="{{ url_for('edit_product_area', product_area_id=product_area.id)}}" class="btn btn-sm btn-success">Edit</a>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                              onclick="deleteButtonHandler({{ product_area.id }});">
+                                        Delete
+                                    </button>
+                                {% endif %}
+                            </td>
+
+
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <small>There are no Product Areas</small>
+                {% endif %}
+
+
+            </tbody>
+        </table>
+         </div>
+    </div>
+    <form  class="form-inline" method="POST" action="">
+        {{ product_area_form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ product_area_form.title.label(class="form-control-label mr-sm-2") }}
+                {% if product_area_form.title.errors %}
+                    {{ product_area_form.title(class="form-control form-control-lg is-invalid  mr-sm-2") }}
+                    <div class="invalid-feedback">
+                        {% for error in product_area_form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ product_area_form.title(class="form-control form-control-lg") }}
+                {% endif %}
+
+
+            </div>
+        <div class="form-group">
+            {{ product_area_form.submit(class="btn btn-outline-info ml-sm-2") }}
+        </div>
+
+    </form>
+    {% if product_area_form.title.errors %}
+    <div class="row">
+
+        {% for error in product_area_form.title.errors %}
+                            <span class="ml-4" style="color: red;">{{ error }}</span>
+        {% endfor %}
+
+    </div>
+
+
+    {% endif %}
+
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Product Area?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form method="POST" action="" id="deleteForm">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function deleteButtonHandler(productAreaId) {
+        var form = document.getElementById("deleteForm");
+        form.action = "/settings/product_area/"+productAreaId+"/delete";
+        console.log(form.action);
+        $('#deleteModal').modal('show');
+    }
+</script>
+{% endblock content %}

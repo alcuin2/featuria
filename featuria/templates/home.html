@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% for feature in features.items %}
+        <div class="card mb-4">
+              <div class="card-header">
+                <h4 class="mt-2">{{ feature.client.name }} <sup title="Priority"> <span class="badge badge-info">{{ feature.priority }}</span></sup></h4>
+                </div>
+              <div class="card-body">
+                  <h5 class="card-title mb-0">{{ feature.title }}
+                      {% if feature.status == "Pending" %}
+                      <span class="badge badge-danger" title="Status">{{ feature.status }}</span> </h5>
+                       {% else %}
+                        <span class="badge badge-success" title="Status">{{ feature.status }}</span> </h5>
+                      {% endif %}
+                  <span class="badge badge-secondary" title="Product area">{{ feature.product_area }}</span>
+                  <p class="card-text">{{ feature.description }}</p>
+                  <small title="Target date"><span class="badge badge-pill badge-dark">{{ datetime.strptime(feature.target_date, "%Y-%M-%d").strftime('%d %b, %Y') }}</span></small>
+
+              </div>
+              <div class="card-footer">
+                  {% if feature.creator.id == current_user.id %}
+                  <a href="{{ url_for('edit_feature', client_id=feature.client_id, feature_id=feature.id)}}" class="btn btn-sm btn-success">Edit</a>
+                      <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="deleteButtonHandler({{ feature.id }});">
+                                         Delete
+                      </button>
+                    {% endif %}
+                    <small class="text-muted mt-2"  style="float: right;">Added by
+                      {% if feature.creator == current_user %}
+                      <span style="font-weight: bold">You</span>
+                      {% else %}
+                      <span style="font-weight: bold">{{ feature.creator.fullname }}</span>
+                      {% endif %}
+                      on {{ feature.date_added.strftime('%d %b, %Y %I: %M %p') }}</small>
+                 </div>
+          </div>
+
+{% endfor %}
+{% for page_num in features.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if features.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+{% endfor %}
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Feature?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form method="POST" action="" id="deleteForm">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function deleteButtonHandler(featureId) {
+        var form = document.getElementById("deleteForm");
+        form.action = "/feature/"+featureId+"/delete";
+        console.log(form.action);
+        $('#deleteModal').modal('show');
+    }
+
+  </script>
+
+{% endblock content %}

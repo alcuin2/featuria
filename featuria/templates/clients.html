@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <form  class="form-inline" method="POST" action="">
+    <legend class="border-bottom mb-2">{{ legend }}</legend>
+        {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-control-label mr-sm-2") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control form-control-lg is-invalid  mr-sm-2") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control form-control-lg") }}
+                {% endif %}
+
+
+            </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info ml-sm-2") }}
+        </div>
+
+    </form>
+    <div class="border-bottom mb-4 mt-2">
+
+        {% if clients_count > 0 %}
+            <table class="table table-striped">
+
+
+            <thead>
+                <tr>
+
+                    <th scope="col">Name</th>
+                    <th scope="col">Features</th>
+                    <th scope="col">Date Added</th>
+                    <th scope="col">Added By</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+            {% for client in clients %}
+                        <tr>
+                            <td><a href="{{ url_for('client_features', client_id=client.id)}}">{{ client.name }}</a></td>
+                            <td>{{ client.features|length }}</td>
+                            <td>{{ client.date_added.strftime('%B %d, %Y') }}</td>
+                            <td>{{ client.creator }}</td>
+                            <td>
+                                {% if client.creator.id == current_user.id %}
+                                    <a href="{{ url_for('edit_client', client_id=client.id)}}" class="btn btn-sm btn-success">Edit</a>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                              onclick="deleteButtonHandler({{ client.id }});">
+                                        Delete
+                                    </button>
+                                {% endif %}
+                            </td>
+
+
+
+                        </tr>
+
+
+
+                    {% endfor %}
+                </tbody>
+                </table>
+
+                {% else %}
+                <span class="ml-4" style="color: red;">There are no clients.</span>
+
+                {% endif %}
+
+
+
+
+
+    </div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Client?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <div class="modal-body">
+        All Feature Requests created for this client will be deleted.
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form method="POST" action="" id="deleteForm">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function deleteButtonHandler(clientId) {
+        var form = document.getElementById("deleteForm");
+        form.action = "/client/"+clientId+"/delete";
+        console.log(form.action);
+        $('#deleteModal').modal('show');
+    }
+</script>
+{% endblock content %}
