@@ -55,7 +55,7 @@ class AddFeatureForm1(FlaskForm):
 class AddFeatureForm2(FlaskForm):
 
     title = StringField('Title', validators=[DataRequired(), Length(min=4)])
-    description = TextAreaField('Description', validators=[DataRequired(), Length(min=20, max=100)])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(min=20, max=500)])
     priority = SelectField('Priority', coerce=int, choices=[], validators=[DataRequired()])
     product_area = SelectField('Product Area', choices=[], validators=[DataRequired()])
     target_date = DateField('Target Date', format='%Y-%m-%d', validators=[DataRequired()])
@@ -65,7 +65,7 @@ class AddFeatureForm2(FlaskForm):
 class UpdateFeatureForm(FlaskForm):
 
     title = StringField('Title', validators=[DataRequired(), Length(min=4)])
-    description = TextAreaField('Description', validators=[DataRequired(), Length(min=20, max=100)])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(min=20, max=500)])
     priority = SelectField('Priority', coerce=int, choices=[], validators=[DataRequired()])
     product_area = SelectField('Product Area', choices=[], validators=[DataRequired()])
     target_date = DateField('Target Date', format='%Y-%m-%d', validators=[DataRequired()])

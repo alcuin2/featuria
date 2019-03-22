@@ -132,13 +132,14 @@ def edit_feature(client_id, feature_id):
     priority_range = PriorityRange.query.get(1)
     for index in range(priority_range.range):
         _feature = Feature.query.filter_by(client_id=client.id).filter_by(priority=index + 1).first()
-        if _feature:
+        if _feature and _feature is not feature:
             pass
         else:
             form.priority.choices.append((index + 1, index + 1))
     for product_area in product_areas:
         form.product_area.choices.append((product_area.title, product_area.title))
     if form.validate_on_submit():
+        print("I'm here")
         feature.title = form.title.data
         feature.description = form.description.data
         feature.priority = form.priority.data
@@ -148,17 +149,18 @@ def edit_feature(client_id, feature_id):
         db.session.commit()
         flash("Feature update successful", "success")
         return redirect(url_for("home"))
-    elif request.method == "GET":
-        form.title.data = feature.title
-        form.description.data = feature.description
-        form.priority.data = feature.priority
-        form.product_area.data = feature.product_area
-        date = feature.target_date
-        date_obj = datetime.strptime(date, "%Y-%M-%d")
-        form.target_date.data = date_obj
-        form.status.data = feature.status
-    return render_template("edit_feature.html", form=form, date_obj=date_obj, legend=f"Edit {client.name}'s Request",
-                           client=client, feature=feature)
+
+    form.title.data = feature.title
+    form.description.data = feature.description
+    form.priority.data = feature.priority
+    form.product_area.data = feature.product_area
+    date = feature.target_date
+    date_obj = datetime.strptime(date, "%Y-%M-%d")
+    form.target_date.data = date_obj
+    form.status.data = feature.status
+
+    return render_template("edit_feature.html", form=form, date_obj=date_obj,
+                           legend=f"Edit {client.name}'s Request", client=client, feature=feature)
 
 
 @app.route("/feature/<int:feature_id>/delete", methods=["POST"])
